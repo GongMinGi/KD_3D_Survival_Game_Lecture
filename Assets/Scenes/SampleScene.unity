@@ -178,12 +178,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a54e198a035956c449165be5f0ee2bcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 3
+  walkSpeed: 10
+  runSpeed: 20
+  jumpForce: 0
   lookSensitivity: 4
-  myRigid: {fileID: 0}
   cameraRotationLimit: 45
   currentCameraRotaionX: 0
   theCamera: {fileID: 2101079661}
+  myRigid: {fileID: 0}
 --- !u!136 &74624277
 CapsuleCollider:
   m_ObjectHideFlags: 0

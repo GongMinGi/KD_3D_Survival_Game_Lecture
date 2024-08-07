@@ -2,16 +2,32 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+
+    //스피드 조정 변수 
     [SerializeField]
     private float walkSpeed;
+    [SerializeField]
+    private float runSpeed;
+    private float applySpeed;
+
+    [SerializeField]
+    private float jumpForce;
+
+
+    //상태 변수
+    private bool isRun = false;
+    private bool isGround = false;
+
+    //땅 착지 여부를 확인하기 위한 변수
+    private CapsuleCollider capsuleCollider;
+
 
     //카메라의 민감도
     [SerializeField]
     private float lookSensitivity;
 
-    // 오브젝트에 물리학을 입혀주는 역할을 함
-    [SerializeField]
-    private Rigidbody myRigid;
+
+    //카메라 각도한계 
 
     //카메라를 통해 고개를 올리고 내릴 때 한계 각도를 설정하기 위한 변수 
     [SerializeField]
@@ -20,8 +36,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float currentCameraRotaionX = 0;
 
+
+    // 필요한 컴포넌트들 
     [SerializeField]
     private Camera theCamera;
+
+    // 오브젝트에 물리학을 입혀주는 역할을 함
+    [SerializeField]
+    private Rigidbody myRigid;
+
+
 
     void Start()
     {
@@ -31,17 +55,66 @@ public class PlayerController : MonoBehaviour
 
 
         myRigid = GetComponent<Rigidbody>();
+
+        applySpeed = walkSpeed;
+        capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
 
     //매 프래임마다 호출되는 함수 대략 1초에 60번
     void Update()
     {
+        //뛰고 있는지 걷고 잇는지 판단하여 이동을 제어할 것이기 때문에 반드시 Move 위에 있어야 한다. 
+        TryRun();
         Move();
         CameraRotation();
         CharacterRotation();
+        TryJump();
     }
 
+    private void TryJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isGround)
+        {
+            Jump();
+        }
+    }
+
+
+    private void Jump()
+    {
+        myRigid.linearVelocity = transform.up * jumpForce;
+    }
+
+    private void TryRun()
+    {
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            Running();
+        }
+        if(Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            RunningCancel();
+        }
+    }
+
+
+
+    //Move 함수의 walkSpeed 변수를 applySpped로 바꾸고 bool타입 isRun 변수를 만들어서 
+    //isRun 변수의 상태에 따라 applySpeed를 walkspeed, runspeed로 바꿔주는 원리
+    private void Running()
+    {
+        isRun = true;
+        applySpeed = runSpeed;
+
+    }
+
+
+    private void RunningCancel()
+    {
+        isRun = false;
+        applySpeed = walkSpeed;
+    }
 
 
     private void Move()
@@ -56,7 +129,7 @@ public class PlayerController : MonoBehaviour
         // transform.forward는 Vector3 (0,0,1)을 의미한다.
         Vector3 _moveVertical = transform.forward * _moveDirZ;
 
-        Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * walkSpeed;
+        Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * applySpeed;
         // (1,0,0) + (0,0,1) = (1, 0, 1) = 2 
         // 따라서 벡터의 합이 1이 나오도록 normalized를 통해 정규화시켜주면 
         // 유니티에서도 계산하기 쉽고, 프로그래머에게도 1초에 오브젝트를 얼마나 이동시킬 것인지 계산하기 편하다.
@@ -66,8 +139,7 @@ public class PlayerController : MonoBehaviour
         //이를 통해 오브젝트가 순간이동하는 것처럼 보이는 현상을 막을 수 있다. 
         // deltatime의 값은 약 0.016 이다. 즉, 해당 단위로 움직임을 쪼개는것
 
-     
-
+    
     }
 
     private void CameraRotation()
