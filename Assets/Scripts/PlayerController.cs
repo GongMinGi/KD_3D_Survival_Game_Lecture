@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,6 +9,9 @@ public class PlayerController : MonoBehaviour
     private float walkSpeed;
     [SerializeField]
     private float runSpeed;
+    [SerializeField]
+    private float crouchSpeed;
+
     private float applySpeed;
 
     [SerializeField]
@@ -17,6 +21,15 @@ public class PlayerController : MonoBehaviour
     //상태 변수
     private bool isRun = false;
     private bool isGround = false;
+    private bool isCrouch = false;
+
+
+    //앉았을 때 얼마나 앉을 지 결정하는 변수. 
+    [SerializeField]
+    private float crouchPosY;
+    private float originPosY;
+    private float applyCrouchPosY;
+
 
     //땅 착지 여부를 확인하기 위한 변수
     private CapsuleCollider capsuleCollider;
@@ -55,9 +68,11 @@ public class PlayerController : MonoBehaviour
 
 
         myRigid = GetComponent<Rigidbody>();
-
         applySpeed = walkSpeed;
         capsuleCollider = GetComponent<CapsuleCollider>();
+        //현재 카메라는 player오브젝트 하위에 있기 때문에 localposition으로 좌표를 가져와야 한다.
+        originPosY = theCamera.transform.localPosition.y;
+        applyCrouchPosY = originPosY;
     }
 
 
@@ -70,8 +85,81 @@ public class PlayerController : MonoBehaviour
         CameraRotation();
         CharacterRotation();
         TryJump();
+        IsGround();
+        TryCrouch();
     }
 
+
+    //앉기 시도
+    private void TryCrouch()
+    {
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            Crouch();
+        }
+    }
+
+    //앉기
+    private void Crouch()
+    {
+        //isCrouch가 true이면 false로 false이면 true로 변환.
+        isCrouch = !isCrouch;
+        
+        if(isCrouch)
+        {
+            applySpeed = crouchSpeed;
+            applyCrouchPosY = crouchPosY;
+        }
+        else
+        {
+            applySpeed = walkSpeed;
+            applyCrouchPosY = originPosY;
+        }
+
+        StartCoroutine(CrouchCoroutine());
+        //theCamera.transform.localPosition = new Vector3(theCamera.transform.localPosition.x, applyCrouchPosY, theCamera.transform.localPosition.z);
+    }
+
+
+
+    //함수의 실행 중에 코루틴을 만나게 되면, 진행중인 함수와 코루틴을 왔다갔다 하는 방식으로 병렬처리를 진행하게 된다. 
+    // 이를 이용해서 함수의 실행중에 waitforsecond등을 이용해서 딜레이를 만들 수 있다. 
+    //부드러운 앉기 동작
+    IEnumerator CrouchCoroutine()
+    {
+        float _posY = theCamera.transform.localPosition.y;
+        int count = 0;
+
+        // y값이 원하는 값이 될 때까지 반복 시킨다. 
+        while(_posY != applyCrouchPosY)
+        {
+            count++;
+            //보간: 처음에는 빠르게 줄어들거나 커지다가 목적지에 가까워질 수록 느리게 증가하거나 줄어듬
+            //Mathf.Lerp(1, 2, 0.5f); => 1에서 2까지 0.5씩 증가한다는의미 
+            _posY = Mathf.Lerp(_posY, applyCrouchPosY, 0.3f);
+            theCamera.transform.localPosition = new Vector3(0, _posY, 0);
+            if (count > 15)
+                break;
+
+            yield return null; // 한 프레임만큼 기다리라는 뜻이다
+       
+        }
+        //보간을 이용하면 값을 부드럽게 변환시킬 수 있지만, 목표값에 무한히 가까워질 뿐 목표값에 도달 하지는 못한다. 
+        //따라서 코루틴을 통해 일정 횟수 반복한 다음에 아래와같이 목표값을 직접 대입해 주는 것이 좋다. 
+        theCamera.transform.localPosition = new Vector3(0, applyCrouchPosY, 0);
+
+        //yield return new WaitForSeconds(1f);
+    }
+
+
+    private void IsGround()
+    {
+        //캡슐 콜라이더의 영역의. 반만큼. y값 만큼 Vector3의 down 방향으로 transform.position에서 레이저를 쏘라는 의미.
+        // 0.1f 는 경사면이나 대각선에 서있을 경우를 대비해서 넣어준 여유값.
+        isGround = Physics.Raycast(transform.position, Vector3.down, capsuleCollider.bounds.extents.y + 0.1f);
+    }
+
+    //점프 시도
     private void TryJump()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGround)
@@ -81,11 +169,19 @@ public class PlayerController : MonoBehaviour
     }
 
 
+
+    //점프
     private void Jump()
     {
+        //앉아있는 상태에서 점프를 시도할 시, Crouch를 호출하여 앉은 상태를 풀어준다. 
+        if (isCrouch)
+            Crouch();
+
+        //rigidbody의 속성인 linearVelocity 를 순간적으로 변화시키는 방식 
         myRigid.linearVelocity = transform.up * jumpForce;
     }
 
+    //달리기 시도 
     private void TryRun()
     {
         if(Input.GetKey(KeyCode.LeftShift))
@@ -102,14 +198,17 @@ public class PlayerController : MonoBehaviour
 
     //Move 함수의 walkSpeed 변수를 applySpped로 바꾸고 bool타입 isRun 변수를 만들어서 
     //isRun 변수의 상태에 따라 applySpeed를 walkspeed, runspeed로 바꿔주는 원리
+    //달리기
     private void Running()
     {
+        if (isCrouch)
+            Crouch();
         isRun = true;
         applySpeed = runSpeed;
 
     }
 
-
+    //달리기 취소
     private void RunningCancel()
     {
         isRun = false;
