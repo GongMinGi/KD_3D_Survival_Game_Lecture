@@ -274,8 +274,8 @@ public class PlayerController : MonoBehaviour
         myRigid.MoveRotation(myRigid.rotation*Quaternion.Euler(_CharacterRotationY));
 
 
-        Debug.Log(myRigid.rotation);
-        Debug.Log(myRigid.rotation.eulerAngles);
+        //Debug.Log(myRigid.rotation);
+        //Debug.Log(myRigid.rotation.eulerAngles);
     }
 }
 
