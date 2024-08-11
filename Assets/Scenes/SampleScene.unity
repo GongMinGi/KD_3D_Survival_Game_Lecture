@@ -340,13 +340,13 @@ MonoBehaviour:
   fireRate: 0.2
   reloadTime: 2
   damage: 30
-  reloadBulletCount: 0
-  currentBulletCount: 0
+  reloadBulletCount: 10
+  currentBulletCount: 10
   maxBulletCount: 0
-  carryBulletCount: 0
+  carryBulletCount: 30
   retroActionForce: 0
   retroActionFineSightForce: 0
-  fineSightOriginPos: {x: 0, y: 0, z: 0}
+  fineSightOriginPos: {x: 0.55, y: 0.335, z: -0.5855}
   anim: {fileID: 212916417}
   muzzleFlash: {fileID: 2109780561}
   fire_Sound: {fileID: 8300000, guid: 07fec9b00f3beee4eb2a4e4c09d2a322, type: 3}
@@ -360,7 +360,7 @@ Animator:
   m_GameObject: {fileID: 212916414}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b12388170dc631d43bef77ffd82c06fb, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1179,6 +1179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentGun: {fileID: 212916416}
+  originPos: {x: 0, y: 0, z: 0}
 --- !u!82 &1868628450
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2855,14 +2856,14 @@ ParticleSystem:
         ctime0: 0
         ctime1: 11796
         ctime2: 21665
-        ctime3: 28296
+        ctime3: 28530
         ctime4: 36314
         ctime5: 65304
         ctime6: 0
         ctime7: 0
         atime0: 28142
         atime1: 65535
-        atime2: 0
+        atime2: 65535
         atime3: 0
         atime4: 0
         atime5: 0

@@ -58,6 +58,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Rigidbody myRigid;
 
+    private GunController theGunController;
+
 
 
     void Start()
@@ -70,6 +72,9 @@ public class PlayerController : MonoBehaviour
         myRigid = GetComponent<Rigidbody>();
         applySpeed = walkSpeed;
         capsuleCollider = GetComponent<CapsuleCollider>();
+        theGunController = FindAnyObjectByType<GunController>(); //FindAnyObjectByType 알아보기
+
+        //초기화
         //현재 카메라는 player오브젝트 하위에 있기 때문에 localposition으로 좌표를 가져와야 한다.
         originPosY = theCamera.transform.localPosition.y;
         applyCrouchPosY = originPosY;
@@ -203,6 +208,9 @@ public class PlayerController : MonoBehaviour
     {
         if (isCrouch)
             Crouch();
+
+        theGunController.CancelFineSight(); //뛸때 정조준 상태 해제
+
         isRun = true;
         applySpeed = runSpeed;
 
