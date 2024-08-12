@@ -212,7 +212,8 @@ public class GunController : MonoBehaviour
         Vector3 recoilBack = new Vector3(currentGun.retroActionForce, originPos.y, originPos.z) ;
         Vector3 retroActionRecoilBack = new Vector3(currentGun.retroActionFineSightForce, currentGun.fineSightOriginPos.y, currentGun.fineSightOriginPos.z);
 
-        if(isFineSightMode)
+        //finesight가 아닐때 실행되야하는데 !를 안찍음..하
+        if(!isFineSightMode)
         {
             //반동을 확실히 표현하기 위해서 총을 처음 위치로 초기화 시켜준다.
             currentGun.transform.localPosition = originPos;
@@ -236,6 +237,7 @@ public class GunController : MonoBehaviour
         {
             currentGun.transform.localPosition = currentGun.fineSightOriginPos;
 
+            //반동시작
             while (currentGun.transform.localPosition.x <= currentGun.retroActionFineSightForce - 0.02f) //Lerp는 목표값과 일치하는 경우가 거의 없기 대문에 0.02정도 여유를 줘서 그정도 근사돼었으면 반복문을 빠져나오도록 한 것.
             {
                 currentGun.transform.localPosition = Vector3.Lerp(currentGun.transform.localPosition, retroActionRecoilBack, 0.4f);
