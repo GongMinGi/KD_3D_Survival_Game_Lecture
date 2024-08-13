@@ -3,24 +3,41 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
+
+
+    //현재 장착된총
     [SerializeField]
     private Gun currentGun;
-
+   
+    //연사속도 계산
     private float currentFireRate; //Gun 스크립트이 Firerate를 가져와서 조금씩 깎아서 0이 되면 총을 발사하고 원래 값으로 돌아오는 형식
 
-    private AudioSource audioSource;
-
+    
+    //상태변수들
     private bool isReload = false;
-
-    private bool isFineSightMode = false; // 정조준 상태를 판별하는 상태값
+    [HideInInspector] //인스펙터 창에서 보이지않게 한다.
+    public bool isFineSightMode = false; // 정조준 상태를 판별하는 상태값
 
     //본래 포지션 값.
     [SerializeField]
     private Vector3 originPos;
 
+    //효과음 재생
+    private AudioSource audioSource;
+
+    //레이저 충돌 정보 받아옴
+    private RaycastHit hitinfo;
+
+    [SerializeField]
+    private Camera theCam;
+
+    //피격 이펙트.
+    [SerializeField]
+    private GameObject hit_effect_prefab;
 
     void Start()
     {
+        originPos = Vector3.zero;
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -35,6 +52,7 @@ public class GunController : MonoBehaviour
 
 
 
+    //연사속도 재계산
     void GunFireRateCalc()
     {
         if(currentFireRate >0)
@@ -46,6 +64,7 @@ public class GunController : MonoBehaviour
         }
     }
 
+    //발사시도
     private void TryFire()
     {
         //deltaTime을 통해 전부 줄어들어 currentFire가 0이 되었을때 발사(Fire함수 호출)
@@ -57,6 +76,7 @@ public class GunController : MonoBehaviour
 
     
     //방아쇠를 당기기 까지 
+    //발사 후 계산
     private void Fire()
     {
         // isReload가 false일때만 실행되도록 수정한다.
@@ -78,6 +98,7 @@ public class GunController : MonoBehaviour
     }
 
     //실제로 총알이 발사되는 과정
+    //발사 후 계산
     private void Shoot()
     {
         currentGun.currentBulletCount--;
@@ -87,13 +108,26 @@ public class GunController : MonoBehaviour
         PlaySE(currentGun.fire_Sound);
         currentGun.muzzleFlash.Play();
 
+        Hit();
+
         //총기 반동 코루틴 실행. 
         StopAllCoroutines();
         StartCoroutine(RetroActionCoroutine());
 
-        Debug.Log("총알 발사함");
     }
 
+
+    private void Hit()
+    {
+        if(Physics.Raycast(theCam.transform.position, theCam.transform.forward, out hitinfo, currentGun.range))
+        {
+            GameObject clone = Instantiate(hit_effect_prefab, hitinfo.point, Quaternion.LookRotation(hitinfo.normal));
+            Destroy(clone, 2f);
+        }
+    }
+
+
+    //재장전 시도
     private void TryReload()
     {
         // R버튼을 눌렀을때, 재장전이아니고, 재장전할 총알개수보다 현재 장전중인 총알 개수가 더 적을때만 실행한다.
@@ -105,6 +139,7 @@ public class GunController : MonoBehaviour
     }
 
     //재장전 중에 총이 발사되지 않게 하기 위해 코루틴을 이용한다. 
+    //재장전
     IEnumerator ReloadCoroutine()
     {
         if(currentGun.carryBulletCount >0)
@@ -147,6 +182,7 @@ public class GunController : MonoBehaviour
         }
     }
 
+    //정조준시도
     private void TryFineSight()
     {
         if(Input.GetButtonDown("Fire2") && !isReload) // 리로드시 정조준불가능 이걸로 stopallcoroutine끼리의 충돌을 막는다. 
@@ -155,6 +191,7 @@ public class GunController : MonoBehaviour
         }
     }
 
+    //정조준 취소 
     public void CancelFineSight()
     {
         if(isFineSightMode)
@@ -163,6 +200,7 @@ public class GunController : MonoBehaviour
         }
     }
 
+    //정조준 로직 가동
     private void FineSight()
     {
         //실행될 때마다 스위치처럼 값이 바뀐다.
@@ -186,6 +224,7 @@ public class GunController : MonoBehaviour
         }
     }
 
+    //정조준 활성화
     IEnumerator FineSightActivateCoroutine()
     {
         while(currentGun.transform.localPosition != currentGun.fineSightOriginPos)
@@ -195,6 +234,7 @@ public class GunController : MonoBehaviour
         }
     }
 
+    //정조준 비활성화
     IEnumerator FineSightDeactivateCoroutine()
     {
         while (currentGun.transform.localPosition != originPos)
@@ -205,6 +245,8 @@ public class GunController : MonoBehaviour
     }
 
 
+
+    //반동 코루틴
     IEnumerator RetroActionCoroutine()
     {
         // 총이 90도 꺾여있기 때문에 앞 뒤 반동을 줄때 z축이 아니라 x축을 기준으로 힘을 작용시켜야 하는 것을 명심할것.
@@ -254,6 +296,8 @@ public class GunController : MonoBehaviour
         }
     }
 
+
+    //사운드 재생
     private void PlaySE(AudioClip _clip)
     {
         audioSource.clip = _clip;
