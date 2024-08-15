@@ -303,4 +303,11 @@ public class GunController : MonoBehaviour
         audioSource.clip = _clip;
         audioSource.Play();
     }
+
+
+    //private인 currentGun을 외부에서 쓸수 있도록 하기 위해 만듬 
+    public Gun GetGun()
+    {
+        return currentGun;
+    }
 }
