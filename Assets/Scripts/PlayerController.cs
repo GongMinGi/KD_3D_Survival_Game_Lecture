@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -19,9 +20,14 @@ public class PlayerController : MonoBehaviour
 
 
     //상태 변수
+    private bool isWalk = false;
     private bool isRun = false;
     private bool isGround = false;
     private bool isCrouch = false;
+
+    //움직임 체크 변수 
+    //이전 프레임의 플레이어의 위치를 해당 변수에 기록해놓고 현재 플레이의 위치와 비교하여, 움직임을 판단한다.
+    private Vector3 lastPos;
 
 
     //앉았을 때 얼마나 앉을 지 결정하는 변수. 
@@ -57,8 +63,8 @@ public class PlayerController : MonoBehaviour
     // 오브젝트에 물리학을 입혀주는 역할을 함
     [SerializeField]
     private Rigidbody myRigid;
-
     private GunController theGunController;
+    private Crosshair theCrosshair;
 
 
 
@@ -67,15 +73,14 @@ public class PlayerController : MonoBehaviour
         //Hierarchy의 오브젝트를 다 뒤져서 type이 카메라인 오브젝트르 가져오는 메서드 
         //카메라가 여러개 있는 경우 원하는 카메라를 가져올 수 없는 문제가 있음
         //theCamera = FindObjectOfType<Camera>();
-
-
         myRigid = GetComponent<Rigidbody>();
-        applySpeed = walkSpeed;
         capsuleCollider = GetComponent<CapsuleCollider>();
         theGunController = FindAnyObjectByType<GunController>(); //FindAnyObjectByType 알아보기
+        theCrosshair = FindAnyObjectByType<Crosshair>(); //hierarchy에서 찾아서 넣어줌.
 
         //초기화
         //현재 카메라는 player오브젝트 하위에 있기 때문에 localposition으로 좌표를 가져와야 한다.
+        applySpeed = walkSpeed;
         originPosY = theCamera.transform.localPosition.y;
         applyCrouchPosY = originPosY;
     }
@@ -87,11 +92,13 @@ public class PlayerController : MonoBehaviour
         //뛰고 있는지 걷고 잇는지 판단하여 이동을 제어할 것이기 때문에 반드시 Move 위에 있어야 한다. 
         TryRun();
         Move();
+        MoveCheck();
         CameraRotation();
         CharacterRotation();
         TryJump();
         IsGround();
         TryCrouch();
+
     }
 
 
@@ -109,8 +116,10 @@ public class PlayerController : MonoBehaviour
     {
         //isCrouch가 true이면 false로 false이면 true로 변환.
         isCrouch = !isCrouch;
-        
-        if(isCrouch)
+        theCrosshair.CrouchingAnimation(isCrouch); //크라우치가 변경될때마다 변경된 값을 매개변수로 보냄
+
+
+        if (isCrouch)
         {
             applySpeed = crouchSpeed;
             applyCrouchPosY = crouchPosY;
@@ -162,6 +171,7 @@ public class PlayerController : MonoBehaviour
         //캡슐 콜라이더의 영역의. 반만큼. y값 만큼 Vector3의 down 방향으로 transform.position에서 레이저를 쏘라는 의미.
         // 0.1f 는 경사면이나 대각선에 서있을 경우를 대비해서 넣어준 여유값.
         isGround = Physics.Raycast(transform.position, Vector3.down, capsuleCollider.bounds.extents.y + 0.1f);
+        theCrosshair.RunningAnimation(!isGround);// !isGround 이므로 isGround가 false일 때만 running과 같은 애니메이션을 실행시키는 것.
     }
 
     //점프 시도
@@ -212,6 +222,7 @@ public class PlayerController : MonoBehaviour
         theGunController.CancelFineSight(); //뛸때 정조준 상태 해제
 
         isRun = true;
+        theCrosshair.RunningAnimation(isRun);
         applySpeed = runSpeed;
 
     }
@@ -220,6 +231,7 @@ public class PlayerController : MonoBehaviour
     private void RunningCancel()
     {
         isRun = false;
+        theCrosshair.RunningAnimation(isRun);
         applySpeed = walkSpeed;
     }
 
@@ -247,6 +259,31 @@ public class PlayerController : MonoBehaviour
         // deltatime의 값은 약 0.016 이다. 즉, 해당 단위로 움직임을 쪼개는것
 
     
+    }
+
+    private void MoveCheck()
+    {
+
+        //Update 함수에서 MoveCheck 함수를 실행함으로써 매 프레임마다 플레이어의 위치를 갱신해준다.
+        if (!isRun && !isCrouch && isGround) // 달리는 상태가 아니고, 웅크린 상태가 아닐때만 실행할수 있게 한다. 
+        {
+            //if (lastPos != transform.position) // 이렇게 위치를 기록하면, 경사로에서 미세하게 미끄러지는 것도 움직인걸로 간주할 수 있다.
+            if(Input.GetAxisRaw("Horizontal")!=0 || Input.GetAxisRaw("Vertical")!=0) // 현재 위치와 이전 위치의 차이값이 0.01보다 큰 경우면 움직이는걸로 간주.
+            {
+                isWalk = true;
+            }
+            else
+            {
+                isWalk = false;
+            }
+            Debug.Log("lastPos: " + lastPos + ", currentPos: " + transform.position + ", Distance: " + Vector3.Distance(lastPos, transform.position));
+            Debug.Log(isWalk);
+
+            theCrosshair.WalkingAnimation(isWalk); //isWalk가 true면 true를 false면 false값을 매개변수로 보낸다. 
+            lastPos = transform.position; //position이 갱신되는 속도보다.. lastPos에 대입되는 시간이 더빠르다?
+        }
+        // 현재 transform.postion의 갱신이 Update함수보다 느리다?
+
     }
 
     private void CameraRotation()

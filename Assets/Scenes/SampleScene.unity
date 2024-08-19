@@ -646,7 +646,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: SubMachineGun1
   range: 10
-  accuracy: 0
+  accuracy: 0.05
   fireRate: 0.2
   reloadTime: 2
   damage: 30
@@ -1296,6 +1296,7 @@ GameObject:
   - component: {fileID: 1043408266}
   - component: {fileID: 1043408265}
   - component: {fileID: 1043408264}
+  - component: {fileID: 1043408267}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1387,6 +1388,21 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1043408267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043408262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7552281d0d02a0f40b300b1b5d2dfbe7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 647876079}
+  go_CrosshairHUD: {fileID: 647876077}
+  theGunController: {fileID: 1868628449}
 --- !u!1 &1126077118
 GameObject:
   m_ObjectHideFlags: 0
