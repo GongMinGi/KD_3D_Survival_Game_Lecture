@@ -78,6 +78,7 @@ public class PlayerController : MonoBehaviour
         theGunController = FindAnyObjectByType<GunController>(); //FindAnyObjectByType 알아보기
         theCrosshair = FindAnyObjectByType<Crosshair>(); //hierarchy에서 찾아서 넣어줌.
 
+
         //초기화
         //현재 카메라는 player오브젝트 하위에 있기 때문에 localposition으로 좌표를 가져와야 한다.
         applySpeed = walkSpeed;
@@ -171,7 +172,10 @@ public class PlayerController : MonoBehaviour
         //캡슐 콜라이더의 영역의. 반만큼. y값 만큼 Vector3의 down 방향으로 transform.position에서 레이저를 쏘라는 의미.
         // 0.1f 는 경사면이나 대각선에 서있을 경우를 대비해서 넣어준 여유값.
         isGround = Physics.Raycast(transform.position, Vector3.down, capsuleCollider.bounds.extents.y + 0.1f);
-        theCrosshair.RunningAnimation(!isGround);// !isGround 이므로 isGround가 false일 때만 running과 같은 애니메이션을 실행시키는 것.
+        if (!isGround)
+        {
+            theCrosshair.JumpingAnimation(!isGround);// !isGround 이므로 isGround가 false일 때만 running과 같은 애니메이션을 실행시키는 것.
+        }
     }
 
     //점프 시도
@@ -216,6 +220,8 @@ public class PlayerController : MonoBehaviour
     //달리기
     private void Running()
     {
+        Debug.Log("러닝호출");
+
         if (isCrouch)
             Crouch();
 
@@ -223,6 +229,7 @@ public class PlayerController : MonoBehaviour
 
         isRun = true;
         theCrosshair.RunningAnimation(isRun);
+
         applySpeed = runSpeed;
 
     }
@@ -230,6 +237,7 @@ public class PlayerController : MonoBehaviour
     //달리기 취소
     private void RunningCancel()
     {
+        Debug.Log("러닝 캔슬 호출");
         isRun = false;
         theCrosshair.RunningAnimation(isRun);
         applySpeed = walkSpeed;
@@ -276,13 +284,11 @@ public class PlayerController : MonoBehaviour
             {
                 isWalk = false;
             }
-            Debug.Log("lastPos: " + lastPos + ", currentPos: " + transform.position + ", Distance: " + Vector3.Distance(lastPos, transform.position));
-            Debug.Log(isWalk);
+
 
             theCrosshair.WalkingAnimation(isWalk); //isWalk가 true면 true를 false면 false값을 매개변수로 보낸다. 
-            lastPos = transform.position; //position이 갱신되는 속도보다.. lastPos에 대입되는 시간이 더빠르다?
+            //lastPos = transform.position; //position이 갱신되는 속도보다.. lastPos에 대입되는 시간이 더빠르다?
         }
-        // 현재 transform.postion의 갱신이 Update함수보다 느리다?
 
     }
 
