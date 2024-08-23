@@ -73,7 +73,7 @@ public abstract class CloseWeaponController : MonoBehaviour
         //raycast를 이용해 충돌체를 반환하고 해당 오브젝트에 공격을 적용하게 끔 트루를 리턴하는 방식 
         if (Physics.Raycast(transform.position, transform.forward, out hitInfo, currentCloseWeapon.range))
         {
-            Debug.Log("Swign");
+            //Debug.Log(hitInfo);
 
             return true;
         }
