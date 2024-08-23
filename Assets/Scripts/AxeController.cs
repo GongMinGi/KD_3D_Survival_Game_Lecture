@@ -1,10 +1,15 @@
 using System.Collections;
 using UnityEngine;
 
-public class HandController : CloseWeaponController
+public class AxeController : CloseWeaponController
 {
     //현재 활성화 여부
     public static bool isActivate = false;
+
+    private void Start()
+    {
+
+    }
 
     void Update()
     {
