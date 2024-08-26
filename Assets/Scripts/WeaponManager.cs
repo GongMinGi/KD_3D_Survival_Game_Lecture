@@ -2,6 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+public enum E_WaphonType
+{
+
+}
+
+public enum E_HitType
+{
+    Rock,
+
+}
+
+public enum E_ObjMatrialType
+{
+    
+}
+
+public class ExtendFns
+{
+    public static bool ISHitType(string p_tag, E_HitType hitType)
+    {
+        LayerMask.GetMask();
+        //LayerMask.NameToLayer();
+
+
+        return true;    
+    }
+}
+
+
 public class WeaponManager : MonoBehaviour
 {
     // static으로 설정된 변수는, 클래스 자체가 가지고 있는 변수로, 해당 클래스로 부터 나온 객체가 변수의 값을 얻기 위해
