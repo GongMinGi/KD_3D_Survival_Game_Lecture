@@ -20,6 +20,10 @@ public abstract class CloseWeaponController : MonoBehaviour
     protected RaycastHit hitInfo;
 
 
+    //필요한 컴포넌트
+    protected PlayerController thePlayerController;
+
+
 
     protected void TryAttack()
     {
@@ -28,35 +32,48 @@ public abstract class CloseWeaponController : MonoBehaviour
         {
             if (!isAttack)
             {
+                if(CheckObject()) //레이케스트의 범위에 물체가 있는지 확인
+                {
+                    if(currentCloseWeapon.isAxe && hitInfo.transform.tag == "Tree") // 현재 도끼를 들고 있고, 목표인 오브젝트의 태그가 Tree인지 확인
+                    {
+                        //레이케스트로 얻어낸 Tree의 treecomponent에서 GetTreeCenterPosition을 통해 중앙조각의 위치를 매개변수로 보낸다.
+                        StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.GetComponent<TreeComponent>().GetTreeCenterPosition()));
+                        //그렇다면 일반적인 공격이 아니라 Chop애니메이션을 실행
+                        StartCoroutine(AttackCoroutine("Chop", currentCloseWeapon.workDelayA, currentCloseWeapon.workDelayB, currentCloseWeapon.workDelay));
+                        return;
+                    }
+                }
+
+
                 //코루틴 실행
-                StartCoroutine(AttackCoroutine());
+                StartCoroutine(AttackCoroutine("Attack", currentCloseWeapon.attackDelayA, currentCloseWeapon.attackDelayB, currentCloseWeapon.attackDelay));
             }
         }
     }
 
-
-    protected IEnumerator AttackCoroutine()
+    //도끼질과 공격의 공격 딜레이가 다 다르고 추후 도끼의 종류에 따라서 딜레이가 달라질 수도 있으므로 인수로 받아서 적용한다.
+    protected IEnumerator AttackCoroutine(string swingType, float _delayA, float _delayB, float _delayC)
     {
         isAttack = true;
 
         //currentHand에 있는 animator의 Attack이라는 트리거를 발동시킨다
         //anim 은 Hand class에서 정의했다.
-        currentCloseWeapon.anim.SetTrigger("Attack");
+        currentCloseWeapon.anim.SetTrigger(swingType);
 
         //팔을 뻗는 대 걸리는 시간에 대한 딜레이 적용 
-        yield return new WaitForSeconds(currentCloseWeapon.attackDelayA);
+        yield return new WaitForSeconds(_delayA);
         isSwing = true;
 
         //공격 활성화 시점
         StartCoroutine(HitCoroutine());
 
         //팔을 접는 대 걸리는 시간에 대한 딜레이 적용
-        yield return new WaitForSeconds(currentCloseWeapon.attackDelayB);
+        yield return new WaitForSeconds(_delayB);
         isSwing = false;
 
         //팔을 접은 이후 다음 공격을 위한 딜레이 시간 
         //전체 attackdelay에서 딜레이 a,b를 빼주면 된다. 
-        yield return new WaitForSeconds(currentCloseWeapon.attackDelay - currentCloseWeapon.attackDelayA - currentCloseWeapon.attackDelayB);
+        yield return new WaitForSeconds(_delayC - _delayA - _delayB);
 
         isAttack = false;
     }

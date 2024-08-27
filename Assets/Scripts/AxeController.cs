@@ -8,6 +8,7 @@ public class AxeController : CloseWeaponController
 
     private void Start()
     {
+        thePlayerController = FindAnyObjectByType<PlayerController>();
 
     }
 
@@ -28,6 +29,17 @@ public class AxeController : CloseWeaponController
 
             if (CheckObject())
             {
+                if(hitInfo.transform.tag == "Grass")
+                {
+                    hitInfo.transform.GetComponent<Grass>().Damage();
+                }
+                else if (hitInfo.transform.tag == "Tree")
+                {
+                    //hitinfo.point:레이케스트로 부딪힌 곳의 실제 월드 상의 좌표
+                    hitInfo.transform.GetComponent<TreeComponent>().Chop(hitInfo.point, transform.eulerAngles.y);
+                }
+
+
                 //충돌됨 
                 isSwing = false;
                 Debug.Log(hitInfo.transform.name);

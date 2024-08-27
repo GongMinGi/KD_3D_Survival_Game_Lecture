@@ -17,6 +17,12 @@ public class CloseWeapon : MonoBehaviour
     public float attackDelayA; // 공격 활성화 시점. 주먹을 뻗어나갈 때까지의 시간 이 사이에 주먹과 츙돌이 일어나면 데미지 처리
     public float attackDelayB; // 공격 비활성화 시점. 주먹을 회수하는데 걸리는 시간 이 사이에는 공격버튼을 눌러도 공격이 나가지 않음
 
+    //일반적인 공격과 나무를 밸떄 (도끼)의 애니메이션 프레임이 다름으로 딜레이를 다르게 줄 필요가 있다.
+
+    public float workDelay; // 작업 딜레이
+    public float workDelayA; // 작업 활성화 시점. 주먹을 뻗어나갈 때까지의 시간 이 사이에 주먹과 츙돌이 일어나면 데미지 처리
+    public float workDelayB; // 작업 비활성화 시점. 주먹을 회수하는데 걸리는 시간 이 사이에는 공격버튼을 눌러도 공격이 나가지 않음
+
 
     public Animator anim; 
     // 손에 박스콜라이더를 달아서 충돌 데미지 처리를 할 수 도 있지만 게임 시점이 1인칭이고 적용은 3인칭에서 되기 때문에, 

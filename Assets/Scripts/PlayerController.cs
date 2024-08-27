@@ -294,24 +294,55 @@ public class PlayerController : MonoBehaviour
 
     private void CameraRotation()
     {
-        float _xRotation = Input.GetAxisRaw("Mouse Y");
-        float _cameraRotationX = _xRotation * lookSensitivity;
+        if (!pauseCameraRotation) // pausecamerarotation이 false 일때만 작동하도록 설정한다
+        {
+            float _xRotation = Input.GetAxisRaw("Mouse Y");
+            float _cameraRotationX = _xRotation * lookSensitivity;
 
 
-        //카메라 로테이션이 증가하면 반대로회전값을 빼줌으로써 마우스 반전 효과를 해결할 수 있다.
-        // +=를 통해 더해 주게 되면 마우스 움직임과 카메라 움직임이 반대가 된다. 
-        currentCameraRotaionX -= _cameraRotationX;
+            //카메라 로테이션이 증가하면 반대로회전값을 빼줌으로써 마우스 반전 효과를 해결할 수 있다.
+            // +=를 통해 더해 주게 되면 마우스 움직임과 카메라 움직임이 반대가 된다. 
+            currentCameraRotaionX -= _cameraRotationX;
 
-        //Mathf.Clamp를 통해 currentCameraRotationX값이 +45도 ~-45도사이에서만 움직이도록 조정할 수 있다.
-        // 매개변수에( 가둘값, 최소값, 최대값) 형태로 입력하여 조정한다. 
-        //최대 최소를 넘는 값이 들어온다면 각각 최대 최소값으로 적용된다. 
-        currentCameraRotaionX = Mathf.Clamp(currentCameraRotaionX, -cameraRotationLimit, cameraRotationLimit);
+            //Mathf.Clamp를 통해 currentCameraRotationX값이 +45도 ~-45도사이에서만 움직이도록 조정할 수 있다.
+            // 매개변수에( 가둘값, 최소값, 최대값) 형태로 입력하여 조정한다. 
+            //최대 최소를 넘는 값이 들어온다면 각각 최대 최소값으로 적용된다. 
+            currentCameraRotaionX = Mathf.Clamp(currentCameraRotaionX, -cameraRotationLimit, cameraRotationLimit);
 
-        //eulerAngle:쿼터니온인 4개의 사원수를 표시하는 함수. 현재는 x,y,z값만 나타낸다고 생각하면 된다. 
-        theCamera.transform.localEulerAngles = new Vector3(currentCameraRotaionX, 0f, 0f);
+            //eulerAngle:쿼터니온인 4개의 사원수를 표시하는 함수. 현재는 x,y,z값만 나타낸다고 생각하면 된다. 
+            theCamera.transform.localEulerAngles = new Vector3(currentCameraRotaionX, 0f, 0f);
+        }
+
+
 
     }
 
+    private bool pauseCameraRotation = false;
+
+    //도끼로 나무를 벌목할때 카메라가 바라보는 방향을 나무의 center 을 바라보도록 하는 코루틴
+    public IEnumerator TreeLookCoroutine( Vector3 _target)
+    {
+        pauseCameraRotation = true;
+
+        //타겟에서 카메라의 위치를 뺌으로써 타겟 방향을 바라보게끔 direction을 설정한다.
+        Quaternion direction = Quaternion.LookRotation(_target - theCamera.transform.position);
+        Vector3 eulerValue = direction.eulerAngles; //쿼터니언값을 오일러 값으로 바꿈 ( 계산하기 편함 ) , 카메라가 향해야할 최종 목적지
+        float destinationX = eulerValue.x;
+
+
+        while(Mathf.Abs( destinationX -currentCameraRotaionX) >= 0.5f)
+        {
+            //계산은 쿼터니온으로하고, 대입할 때는 오일러값으로 변환하여 넣어주는 것.
+            eulerValue = Quaternion.Lerp(theCamera.transform.localRotation, direction, 0.3f).eulerAngles; //쿼터니언 값으로 계산한 각도를 오일러각도로 바꿔서 넣어준다.
+            theCamera.transform.localRotation = Quaternion.Euler(eulerValue.x, 0f, 0f);  //transform에 넣기 전에 쿼터니온으로 변환
+            currentCameraRotaionX = theCamera.transform.localEulerAngles.x; //transform은 쿼터니온이므로 다시 오일러로 변환해서 넣어준 것.
+            yield return null;
+        }
+
+
+
+        pauseCameraRotation = false;
+    }
 
     //좌우 캐릭터 회전
     private void CharacterRotation()
