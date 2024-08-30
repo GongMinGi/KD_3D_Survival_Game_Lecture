@@ -17,6 +17,9 @@ public class ActionController : MonoBehaviour
     //필요한 컴포넌트
     [SerializeField]
     private Text actionText;
+    [SerializeField]
+    private Inventory theInventory;
+
 
     //e키가 눌리면 아이템을 습득하게 하기 위해 사용 
     void Update()
@@ -43,6 +46,7 @@ public class ActionController : MonoBehaviour
             if(hitInfo.transform != null) //오류 방지 
             {
                 Debug.Log(hitInfo.transform.GetComponent<ItemPickUp>().item.itemName + "획득했습니다");
+                theInventory.AcquireItem(hitInfo.transform.GetComponent<ItemPickUp>().item);
                 Destroy(hitInfo.transform.gameObject);
                 InfoDisappear();
             }
