@@ -27,26 +27,27 @@ public abstract class CloseWeaponController : MonoBehaviour
 
     protected void TryAttack()
     {
-        //Fire1에는 마우스 좌클릭 말고도 leftControl이 할당되어 있기 때문에 edit-projectSetting-inputmanager에서 지워준다. 
-        if (Input.GetButton("Fire1"))
+        if (!Inventory.inventoryActivated)
         {
-            if (!isAttack)
+            //Fire1에는 마우스 좌클릭 말고도 leftControl이 할당되어 있기 때문에 edit-projectSetting-inputmanager에서 지워준다. 
+            if (Input.GetButton("Fire1"))
             {
-                if(CheckObject()) //레이케스트의 범위에 물체가 있는지 확인
+                if (!isAttack)
                 {
-                    if(currentCloseWeapon.isAxe && hitInfo.transform.tag == "Tree") // 현재 도끼를 들고 있고, 목표인 오브젝트의 태그가 Tree인지 확인
+                    if (CheckObject()) //레이케스트의 범위에 물체가 있는지 확인
                     {
-                        //레이케스트로 얻어낸 Tree의 treecomponent에서 GetTreeCenterPosition을 통해 중앙조각의 위치를 매개변수로 보낸다.
-                        StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.GetComponent<TreeComponent>().GetTreeCenterPosition()));
-                        //그렇다면 일반적인 공격이 아니라 Chop애니메이션을 실행
-                        StartCoroutine(AttackCoroutine("Chop", currentCloseWeapon.workDelayA, currentCloseWeapon.workDelayB, currentCloseWeapon.workDelay));
-                        return;
+                        if (currentCloseWeapon.isAxe && hitInfo.transform.tag == "Tree") // 현재 도끼를 들고 있고, 목표인 오브젝트의 태그가 Tree인지 확인
+                        {
+                            //레이케스트로 얻어낸 Tree의 treecomponent에서 GetTreeCenterPosition을 통해 중앙조각의 위치를 매개변수로 보낸다.
+                            StartCoroutine(thePlayerController.TreeLookCoroutine(hitInfo.transform.GetComponent<TreeComponent>().GetTreeCenterPosition()));
+                            //그렇다면 일반적인 공격이 아니라 Chop애니메이션을 실행
+                            StartCoroutine(AttackCoroutine("Chop", currentCloseWeapon.workDelayA, currentCloseWeapon.workDelayB, currentCloseWeapon.workDelay));
+                            return;
+                        }
                     }
+                    //코루틴 실행
+                    StartCoroutine(AttackCoroutine("Attack", currentCloseWeapon.attackDelayA, currentCloseWeapon.attackDelayB, currentCloseWeapon.attackDelay));
                 }
-
-
-                //코루틴 실행
-                StartCoroutine(AttackCoroutine("Attack", currentCloseWeapon.attackDelayA, currentCloseWeapon.attackDelayB, currentCloseWeapon.attackDelay));
             }
         }
     }
