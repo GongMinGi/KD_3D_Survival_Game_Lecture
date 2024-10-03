@@ -19,14 +19,19 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     private GameObject go_CountImage;
 
     private WeaponManager theWeaponManager;
+    private Rect baseRect; //x,y 너비 높이 좌표를 정의하는 타입, 사각형을 정의하는 타입
+    private InputNumber theInputNumber;
 
     void Start()
     {
+        // 인벤토리 박스의 크기를 baseRect로 받아와야 하므로 슬롯의 부모의 부모의 rect에 접근한다. 
+        baseRect = transform.parent.parent.GetComponent<RectTransform>().rect;
         originPos = transform.position;
         //프리팹으로 된 것들은 serializeField가 자기 자신 안에 있는 객체들만 참조할 수 있다.
         //웨폰매니저는 프리팹에 포함되어잇지 않으므로 잘 못찾는다. 따라서 findobjectbytype으로 찾아줘야 함.
         // 이건 instantiate 로 생성된 프리팹에 해당하는 이야기, 하이어아키에 나와있는 프리팹들은 serializedfield가 잘 찾는다.
         theWeaponManager = FindAnyObjectByType<WeaponManager>();
+        theInputNumber = FindAnyObjectByType<InputNumber>();
     }    
 
 
@@ -132,9 +137,29 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     public void OnEndDrag(PointerEventData eventData)
     {
+
         Debug.Log("OnEndDrag호출됨");
-        DragSlot.instance.SetColor(0);
-        DragSlot.instance.dragSlot = null;
+        if(DragSlot.instance.transform.localPosition.x < baseRect.xMin 
+            || DragSlot.instance.transform.localPosition.x > baseRect.xMax
+            || DragSlot.instance.transform.localPosition.y <baseRect.yMin
+            || DragSlot.instance.transform.localPosition.y > baseRect.yMax)
+        {
+            Debug.Log("인벤토리 영역을 벗어났음");
+            //// theWeaponManager가 플레이어 오브젝트에 붙어 있으므로, 플레이어의 위치 + 약간 forward 쪽에 생성되게 된다. Quaternion은 identity로 설정했으므로 회전값은 없다.
+            //Instantiate(DragSlot.instance.dragSlot.item.itemPrefab, theWeaponManager.transform.position + theWeaponManager.transform.forward, Quaternion.identity);
+            //DragSlot.instance.dragSlot.ClearSlot(); //아이템을 생성한다음엔 버려져야 하므로 ClearSlot으로 지워준다.
+            if(DragSlot.instance.dragSlot != null)
+            {
+
+                theInputNumber.Call();
+            }
+        }
+        else
+        {
+            DragSlot.instance.SetColor(0);
+            DragSlot.instance.dragSlot = null;
+        }
+
     }
 
     public void OnDrop(PointerEventData eventData)

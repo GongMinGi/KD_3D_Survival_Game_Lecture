@@ -62,7 +62,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fc7cee38a4f10614e89bcd42e1ce57ae, type: 3}
       propertyPath: m_Name
-      value: little_twig
+      value: little_twig_item
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fc7cee38a4f10614e89bcd42e1ce57ae, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fc7cee38a4f10614e89bcd42e1ce57ae, type: 3}
+      propertyPath: m_TagString
+      value: Item
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -74,6 +82,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fc7cee38a4f10614e89bcd42e1ce57ae, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2876238426807645791}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fc7cee38a4f10614e89bcd42e1ce57ae, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4061551970247712240}
   m_SourcePrefab: {fileID: 100100000, guid: fc7cee38a4f10614e89bcd42e1ce57ae, type: 3}
 --- !u!1 &2008753955722515983 stripped
 GameObject:
@@ -128,3 +139,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4061551970247712240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008753955722515983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bafadc02caf0a41a3d258bd2abfab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 11400000, guid: 614566285a2e15c4facc6d03f02e0e64, type: 2}

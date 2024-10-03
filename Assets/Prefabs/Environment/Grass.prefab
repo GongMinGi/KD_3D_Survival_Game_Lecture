@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 3.796
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalPosition.y
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.032
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -38,15 +38,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b4140a7524f916540a164a4ccf660ee4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -205,6 +205,8 @@ MonoBehaviour:
   destroyTime: 5
   force: 0.05
   go_hit_effect_prefab: {fileID: 828393675521685881, guid: 456b1dc79774a2b4395dcbd5d8fea8e9, type: 3}
+  item_leaf: {fileID: 11400000, guid: c9678cde8f85c8645bbb5d722da931aa, type: 2}
+  leafCount: 3
   hit_sound: Twig_Hit
 --- !u!1 &785133228151132884 stripped
 GameObject:
