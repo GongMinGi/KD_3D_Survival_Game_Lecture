@@ -5,7 +5,7 @@ using UnityEngine.UI;
 //인터페이스는 다중 상속이 가능하다.
 public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-    private Vector3 originPos;
+
 
     public Item item; // 획득한 아이템
     public int itemCount; //획득한 아이템의 개수
@@ -18,19 +18,19 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     [SerializeField]
     private GameObject go_CountImage;
 
-    private WeaponManager theWeaponManager;
+    private ItemEffectDatabase theItemEffectDatabase;
     private Rect baseRect; //x,y 너비 높이 좌표를 정의하는 타입, 사각형을 정의하는 타입
     private InputNumber theInputNumber;
 
     void Start()
     {
+        theItemEffectDatabase = FindFirstObjectByType<ItemEffectDatabase>();
         // 인벤토리 박스의 크기를 baseRect로 받아와야 하므로 슬롯의 부모의 부모의 rect에 접근한다. 
         baseRect = transform.parent.parent.GetComponent<RectTransform>().rect;
-        originPos = transform.position;
+
         //프리팹으로 된 것들은 serializeField가 자기 자신 안에 있는 객체들만 참조할 수 있다.
         //웨폰매니저는 프리팹에 포함되어잇지 않으므로 잘 못찾는다. 따라서 findobjectbytype으로 찾아줘야 함.
         // 이건 instantiate 로 생성된 프리팹에 해당하는 이야기, 하이어아키에 나와있는 프리팹들은 serializedfield가 잘 찾는다.
-        theWeaponManager = FindAnyObjectByType<WeaponManager>();
         theInputNumber = FindAnyObjectByType<InputNumber>();
     }    
 
@@ -94,19 +94,12 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
         //해당 스크립트를 가진 객체에 우클릭을 하면 이벤트 실행 
         if(eventData.button == PointerEventData.InputButton.Right)
         {
-            if(item != null)
-            {
-                if(item.itemType == Item.ItemType.Equipment)
-                {
-                    //장착
-                    StartCoroutine(theWeaponManager.ChangeWeaponCoroutine(item.weaponType, item.itemName));
-                }
-                else
-                {
-                    //소모
-                    Debug.Log(item.itemName + " 을 사용했습니다.");
-                    SetSlotCount(-1);
-                }
+            if(item != null)//장비아이템과 소모아이템의 구분을 ItemEffectDatabase로 넘긴다.
+            {//해당 스크립트에서는 소모만 적용 시킨다.
+                theItemEffectDatabase.UseItem(item);
+                //소모 (아이템의 타입이 소모품일 때만)
+                if(item.itemType == Item.ItemType.Used)
+                    SetSlotCount(-1);       
             }
         }
     }
